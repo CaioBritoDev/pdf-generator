@@ -6,7 +6,8 @@ export default async function handler(req, res) {
         const { name, age } = req.body;
 
         // Launch a headless browser instance (Playwright uses Chromium by default)
-        const browser = await chromium.launch();
+        const browser = await chromium.launch({ executablePath: '/path/to/chromium/executable' });
+
 
         // Create a new page in the browser
         const page = await browser.newPage();
