@@ -8,7 +8,7 @@ export default async function handler(req, res) {
         const { name, age } = req.body;
 
         // Launch a headless browser instance
-        const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome' });
+        const browser = await puppeteer.launch({ executablePath: '/usr/bin' });
 
         // Open a new page
         const page = await browser.newPage();
