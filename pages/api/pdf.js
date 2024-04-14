@@ -1,4 +1,6 @@
 import puppeteer from 'puppeteer';
+import fs from 'fs';
+import path from 'path';
 
 export default async function handler(req, res) {
     try {
@@ -31,12 +33,13 @@ export default async function handler(req, res) {
         // Close the browser instance
         await browser.close();
 
-        // Set response headers
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename="generated_pdf.pdf"');
+        // Save the PDF file to a publicly accessible location
+        const filePath = path.join(process.cwd(), 'public', 'generated_pdf.pdf');
+        fs.writeFileSync(filePath, pdfBuffer);
 
-        // Send the PDF buffer as the response
-        res.send(pdfBuffer);
+        // Return the URL to download the saved PDF file
+        const downloadUrl = `${process.env.PUBLIC_SITE_URL}/generated_pdf.pdf`;
+        res.status(200).json({ downloadUrl });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
