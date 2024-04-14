@@ -1,19 +1,17 @@
-import puppeteer from 'puppeteer';
-import fs from 'fs';
-import path from 'path';
+import { chromium } from 'playwright';
 
 export default async function handler(req, res) {
     try {
         // Get dynamic data from the request body
         const { name, age } = req.body;
 
-        // Launch a headless browser instance
-        const browser = await puppeteer.launch({ executablePath: '/usr/bin' });
+        // Launch a headless browser instance (Playwright uses Chromium by default)
+        const browser = await chromium.launch();
 
-        // Open a new page
+        // Create a new page in the browser
         const page = await browser.newPage();
 
-        // Set the HTML content with dynamic data
+        // Construct HTML content with dynamic data
         const htmlContent = `
             <html>
             <head><title>Generated PDF</title></head>
@@ -30,16 +28,13 @@ export default async function handler(req, res) {
         // Generate PDF from the HTML content
         const pdfBuffer = await page.pdf();
 
-        // Close the browser instance
+        // Close the browser
         await browser.close();
 
-        // Save the PDF file to a publicly accessible location
-        const filePath = path.join(process.cwd(), 'public', 'generated_pdf.pdf');
-        fs.writeFileSync(filePath, pdfBuffer);
-
-        // Return the URL to download the saved PDF file
-        const downloadUrl = `${process.env.PUBLIC_SITE_URL}/generated_pdf.pdf`;
-        res.status(200).json({ downloadUrl });
+        // Send the generated PDF buffer as a response
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=generated_pdf.pdf');
+        res.status(200).send(pdfBuffer);
     } catch (error) {
         console.error('Error:', error);
         res.status(500).send('Internal Server Error');
