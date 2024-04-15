@@ -1,12 +1,10 @@
-
-import { exec, execSync } from 'child_process';
-import wkhtmltopdf from 'wkhtmltopdf';
-
 export default async function handler(req, res) {
   //if (req.method === 'POST') {
     try {
       // Get HTML content from request body
       const htmlContent = req.body.htmlContent ? req.body.htmlContent : "<html><h1>Hello, World!</h1></html>";
+
+      const wkhtmltopdf = require("wkhtmltopdf");
 
       // Generate PDF using wkhtmltopdf
       wkhtmltopdf(htmlContent)
