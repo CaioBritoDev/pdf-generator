@@ -1,22 +1,38 @@
+
+import puppeteer from 'puppeteer';
+import htmlToPdf from 'puppeteer-html-pdf';
+
 export default async function handler(req, res) {
+  if (req.method === 'POST') {
+    try {
+      const htmlContent = req.body.htmlContent;
 
-  const html = req.body;
+      // Inicializa o navegador Puppeteer
+      const browser = await puppeteer.launch({executablePath: '/usr/bin/google-chrome'});
 
-  const PuppeteerHTMLPDF = require('puppeteer-html-pdf');
+      // Abre uma nova página
+      const page = await browser.newPage();
 
-  const htmlPDF = new PuppeteerHTMLPDF();
+      // Define o conteúdo HTML na página
+      await page.setContent(htmlContent);
 
-  const options = { 
-    format: 'A4'
+      // Gera o PDF usando puppeteer-html-pdf
+      const pdfBuffer = await htmlToPdf.generatePdf(page);
+
+      // Fecha o navegador
+      await browser.close();
+
+      // Define os cabeçalhos da resposta
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename=generated_pdf.pdf');
+
+      // Envie o PDF como resposta
+      res.status(200).send(pdfBuffer);
+    } catch (error) {
+      console.error('Erro ao gerar o PDF:', error);
+      res.status(500).send('Erro interno do servidor');
+    }
+  } else {
+    res.status(405).send('Método não permitido');
   }
-
-  htmlPDF.setOptions(options);
-      
-  try {
-    const pdf = await htmlPDF.create(html); 
-    res.send(pdf);
-  } catch (error) {
-    console.log('PuppeteerHTMLPDF error', error);
-  }
-
 }
