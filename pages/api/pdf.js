@@ -1,20 +1,22 @@
 export default async function handler(req, res) {
-  //if (req.method === 'POST') {
-    try {
-      // Get HTML content from request body
-      const htmlContent = req.body.htmlContent ? req.body.htmlContent : "<html><h1>Hello, World!</h1></html>";
 
-      const wkhtmltopdf = require("wkhtmltopdf");
+  const html = req.body;
 
-      // Generate PDF using wkhtmltopdf
-      wkhtmltopdf(htmlContent)
-        .pipe(res);
+  const PuppeteerHTMLPDF = require('puppeteer-html-pdf');
 
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      res.status(500).send('Internal Server Error');
-    }
-  //} else {
-   // res.status(405).send('Method Not Allowed');
-  //}
+  const htmlPDF = new PuppeteerHTMLPDF();
+
+  const options = { 
+    format: 'A4'
+  }
+
+  htmlPDF.setOptions(options);
+      
+  try {
+    const pdf = await htmlPDF.create(html); 
+    res.send(pdf);
+  } catch (error) {
+    console.log('PuppeteerHTMLPDF error', error);
+  }
+
 }
