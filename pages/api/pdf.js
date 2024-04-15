@@ -26,7 +26,7 @@ export default async function handler(req, res) {
 // Function to generate PDF using wkhtmltopdf
 function generatePDF(htmlContent) {
   return new Promise((resolve, reject) => {
-    const command = `/usr/local/bin/wkhtmltopdf - -`;
+    const command = `echo "${htmlContent}" | wkhtmltopdf - -`;
     const childProcess = exec(command, (error, stdout, stderr) => {
       if (error) {
         console.error('Error generating PDF:', error);
