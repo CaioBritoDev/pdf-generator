@@ -8,7 +8,7 @@ export default async function handler(req, res) {
       const htmlContent = req.body.htmlContent;
 
       // Inicializa o navegador Puppeteer
-      const browser = await puppeteer.launch({executablePath: '/usr/bin/google-chrome'});
+      const browser = await puppeteer.launch();
 
       // Abre uma nova página
       const page = await browser.newPage();
